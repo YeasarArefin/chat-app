@@ -10,16 +10,20 @@ app.use(cors());
 const io = new Server(server, {
     cors: {
         origin: 'https://money-chat.netlify.app',
+        // origin: 'http://localhost:3000',
         methods: ['GET', 'POST']
     }
 });
 
 io.on('connection', (socket) => {
+
     console.log('user connected', socket.id);
 
-    socket.on('join_room', (data) => {
-        socket.join(data);
-        console.log(`user with id: ${socket.id} joind room: ${data}`);
+    socket.on('join_room', ({ room, name }) => {
+        socket.join(room);
+        socket.emit('message', { author: 'System', message: `You just joinde the chat` });
+        socket.broadcast.to(room).emit('message', { author: 'System', message: `${name} just joinde the chat` });
+        console.log(`user with id: ${socket.id} joind room: ${room}`);
     });
 
     socket.on('send_message', (data) => {
