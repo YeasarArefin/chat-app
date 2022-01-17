@@ -32,4 +32,6 @@ io.on('connection', (socket) => {
 
 });
 
+app.get('/', (req, res) => res.send('money chat server running'));
+
 server.listen(port, () => console.log('server running at port 5000'));
