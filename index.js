@@ -21,9 +21,9 @@ io.on('connection', (socket) => {
 
     socket.on('join_room', ({ room, name }) => {
         socket.join(room);
-        socket.emit('message', { author: 'System', message: `You just joinde the chat` });
-        socket.broadcast.to(room).emit('message', { author: 'System', message: `${name} just joinde the chat` });
-        console.log(`user with id: ${socket.id} joind room: ${room}`);
+        socket.emit('message', { author: 'System', message: `You just joined the chat` });
+        socket.broadcast.to(room).emit('message', { author: 'System', message: `${name} just joined the chat` });
+        console.log(`user with id: ${socket.id} joined room: ${room}`);
     });
 
     socket.on('send_message', (data) => {
