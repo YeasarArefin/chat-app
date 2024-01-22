@@ -16,7 +16,7 @@ const io = new Server(server, {
     }
 });
 
-const users = [];
+let users = [];
 
 io.on('connection', (socket) => {
     console.log('joined :', socket.id);
@@ -33,6 +33,7 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         const disconnectedUser = users.filter((user) => user.id === socket.id);
+        users = users.filter((user) => user.id !== socket.id);
         console.log("🚀 ~ socket.on ~ disconnectedUser:", disconnectedUser);
         socket.broadcast.emit('message', { author: 'System', message: `${disconnectedUser[0]?.name} just left the chat` });
         console.log('disconnected :', socket.id);
