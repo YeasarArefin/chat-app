@@ -22,7 +22,7 @@ io.on('connection', (socket) => {
     console.log('joined :', socket.id);
     socket.on('join_room', ({ room, name }) => {
         socket.join(room);
-        const existingUsers = users.map(user => user.name).join(',');
+        const existingUsers = users.map(user => user.name).join(', ');
 
         socket.emit('message', { author: 'System', message: `You just joined the chat` });
 
