@@ -22,7 +22,15 @@ io.on('connection', (socket) => {
     console.log('joined :', socket.id);
     socket.on('join_room', ({ room, name }) => {
         socket.join(room);
+        const existingUsers = users.map(user => user.name).join(',');
+
         socket.emit('message', { author: 'System', message: `You just joined the chat` });
+
+        if (users.length === 1) {
+            socket.emit('message', { author: 'System', message: `${existingUsers} have already joined the chat` });
+        } else if (users.length > 1) {
+            socket.emit('message', { author: 'System', message: `${existingUsers} they have already joined the chat` });
+        }
         socket.broadcast.to(room).emit('message', { author: 'System', message: `${name} just joined the chat` });
         users.push({ id: socket.id, name, room });
     });
