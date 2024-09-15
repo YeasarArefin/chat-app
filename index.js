@@ -47,6 +47,7 @@ io.on('connection', (socket) => {
     socket.on('send_file', (data) => {
         const base64File = Buffer.from(data.file).toString('base64');
         socket.to(roomCode).emit('receive_file', {
+            author: data.author,
             filename: data.filename,
             file: base64File
         });
