@@ -18,19 +18,23 @@ const io = new Server(server, {
 });
 
 let users = [];
+let existingUsers = [];
+let roomCode;
 
 io.on('connection', (socket) => {
     console.log('joined :', socket.id);
     socket.on('join_room', ({ room, name }) => {
         socket.join(room);
-        const existingUsers = users.map(user => user.name).join(', ');
+        roomCode = room;
+        existingUsers = users.filter(user => user.room === room);
+        const existingUsersName = existingUsers.map(user => user.name).join(', ');
 
         socket.emit('message', { author: 'System', message: `You just joined the chat` });
 
-        if (users.length === 1) {
-            socket.emit('message', { author: 'System', message: `${existingUsers} have already joined the chat` });
-        } else if (users.length > 1) {
-            socket.emit('message', { author: 'System', message: `${existingUsers} they have already joined the chat` });
+        if (existingUsers.length === 1) {
+            socket.emit('message', { author: 'System', message: `${existingUsersName} have already joined the chat` });
+        } else if (existingUsers.length > 1) {
+            socket.emit('message', { author: 'System', message: `${existingUsersName} they have already joined the chat` });
         }
         socket.broadcast.to(room).emit('message', { author: 'System', message: `${name} just joined the chat` });
         users.push({ id: socket.id, name, room });
@@ -40,11 +44,21 @@ io.on('connection', (socket) => {
         socket.to(data.room).emit('receive_message', data);
     });
 
+    socket.on('send_file', (data) => {
+        const base64File = Buffer.from(data.file).toString('base64');
+        socket.to(roomCode).emit('receive_file', {
+            filename: data.filename,
+            file: base64File
+        });
+    });
+
     socket.on('disconnect', () => {
         const disconnectedUser = users.filter((user) => user.id === socket.id);
         users = users.filter((user) => user.id !== socket.id);
+        existingUsers = existingUsers.filter((user) => user.id !== socket.id);
+        console.log(roomCode);
         console.log("🚀 ~ socket.on ~ disconnectedUser:", disconnectedUser);
-        socket.broadcast.emit('message', { author: 'System', message: `${disconnectedUser[0]?.name} just left the chat` });
+        socket.broadcast.to(roomCode).emit('message', { author: 'System', message: `${disconnectedUser[0]?.name} just left the chat` });
         console.log('disconnected :', socket.id);
     });
 
