@@ -5,7 +5,7 @@ const port = process.env.PORT || 5000;
 const app = express();
 const server = http.createServer(app);
 const { Server } = require('socket.io');
-const { log } = require('console');
+
 app.use(cors());
 
 const io = new Server(server, {
@@ -32,7 +32,6 @@ io.on('connection', (socket) => {
             socket.emit('message', { author: 'System', message: `${existingUsersName} they have already joined the chat` });
         }
         socket.broadcast.to(room).emit('message', { author: 'System', message: `${name} joined the chat` });
-        console.log(newUser);
         users.push(newUser);
     });
 
@@ -49,15 +48,15 @@ io.on('connection', (socket) => {
         });
     });
 
+    socket.on("typing", ({ room, name }) => socket.to(room).emit("typing", { name }));
+    socket.on("stop_typing", ({ room, name }) => socket.to(room).emit("stop_typing", { name }));
+
     socket.on('disconnect', () => {
         const disconnectedUser = users.filter((user) => user.id === socket.id)[0];
         users = users.filter((user) => user.id !== socket.id);
         socket.broadcast.to(disconnectedUser?.room).emit('message', { author: 'System', message: `${disconnectedUser?.name} left the chat` });
-        console.log("🚀 ~ socket.on ~ disconnectedUser:", disconnectedUser);
     });
-
 });
 
 app.get('/', (req, res) => res.send('money chat server running'));
-
 server.listen(port, () => console.log('server running at port 5000'));
