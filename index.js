@@ -9,6 +9,7 @@ const { Server } = require('socket.io');
 app.use(cors());
 
 const io = new Server(server, {
+    maxHttpBufferSize: 1e8, // 100MB limit
     cors: {
         origin: '*',
         methods: ['GET', 'POST']
