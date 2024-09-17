@@ -9,7 +9,7 @@ const { Server } = require('socket.io');
 app.use(cors());
 
 const io = new Server(server, {
-    maxHttpBufferSize: 1e8, // 100MB limit
+    maxHttpBufferSize: 2e8, // 100MB limit
     cors: {
         origin: '*',
         methods: ['GET', 'POST']
@@ -33,6 +33,8 @@ io.on('connection', (socket) => {
             socket.emit('message', { author: 'System', message: `${existingUsersName} they have already joined the chat` });
         }
         socket.broadcast.to(room).emit('message', { author: 'System', message: `${name} joined the chat` });
+        console.log('Total User : ', users.length);
+        console.log('Joined User : ', newUser);
         users.push(newUser);
     });
 
@@ -56,6 +58,7 @@ io.on('connection', (socket) => {
         const disconnectedUser = users.filter((user) => user.id === socket.id)[0];
         users = users.filter((user) => user.id !== socket.id);
         socket.broadcast.to(disconnectedUser?.room).emit('message', { author: 'System', message: `${disconnectedUser?.name} left the chat` });
+        console.log('Disconnected User : ', disconnectedUser);
     });
 });
 
