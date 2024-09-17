@@ -5,6 +5,7 @@ const port = process.env.PORT || 5000;
 const app = express();
 const server = http.createServer(app);
 const { Server } = require('socket.io');
+const { disconnect } = require('process');
 
 app.use(cors());
 
@@ -33,9 +34,9 @@ io.on('connection', (socket) => {
             socket.emit('message', { author: 'System', message: `${existingUsersName} they have already joined the chat` });
         }
         socket.broadcast.to(room).emit('message', { author: 'System', message: `${name} joined the chat` });
+        users.push(newUser);
         console.log('Total User : ', users.length);
         console.log('Joined User : ', newUser);
-        users.push(newUser);
     });
 
     socket.on('send_message', (data) => {
@@ -58,7 +59,9 @@ io.on('connection', (socket) => {
         const disconnectedUser = users.filter((user) => user.id === socket.id)[0];
         users = users.filter((user) => user.id !== socket.id);
         socket.broadcast.to(disconnectedUser?.room).emit('message', { author: 'System', message: `${disconnectedUser?.name} left the chat` });
-        console.log('Disconnected User : ', disconnectedUser);
+        if (disconnect) {
+            console.log('Disconnected User : ', disconnectedUser);
+        }
     });
 });
 
