@@ -9,18 +9,8 @@ const { disconnect } = require('process');
 
 app.use(cors());
 
-// const io = new Server(server, {
-//     maxHttpBufferSize: 2e8, // 100MB limit,
-//     cors: {
-//         origin: '*',
-//         methods: ['GET', 'POST']
-//     }
-// });
-
 const io = new Server(server, {
     maxHttpBufferSize: 2e8, // 100MB limit,
-    path: '/',
-    addTrailingSlash: false,
     cors: {
         origin: '*',
         methods: ['GET', 'POST']
